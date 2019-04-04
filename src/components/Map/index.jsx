@@ -1,7 +1,6 @@
 /* eslint-disable max-len, no-underscore-dangle */
 import React, { useEffect, useRef } from 'react'
 import PropTypes from 'prop-types'
-import { Box } from 'rebass'
 
 import mapboxgl from 'mapbox-gl'
 import 'mapbox-gl/dist/mapbox-gl.css'
@@ -33,7 +32,8 @@ const Map = ({ bounds, grid, location }) => {
   console.log('render map')
 
   const mapNode = useRef(null)
-  let map = null
+  const markerRef = useRef(null)
+  const mapRef = useRef(null)
 
   useEffect(() => {
     console.log('construct map')
@@ -57,12 +57,13 @@ const Map = ({ bounds, grid, location }) => {
 
     mapboxgl.accessToken = accessToken
 
-    map = new mapboxgl.Map({
+    const map = new mapboxgl.Map({
       container: mapNode.current,
       style: `mapbox://styles/mapbox/${styleID}`,
       center: center || config.center,
       zoom: zoom || config.zoom,
     })
+    mapRef.current = map
     window.map = map
 
     map.addControl(new mapboxgl.NavigationControl(), 'top-right')
@@ -74,7 +75,24 @@ const Map = ({ bounds, grid, location }) => {
 
   useEffect(
     () => {
-      console.log('location changed', location)
+      const { current: map } = mapRef
+      const { current: marker } = markerRef
+
+      if (location !== null) {
+        const { latitude, longitude } = location
+        map.flyTo({ center: [longitude, latitude], zoom: 10 })
+
+        if (!marker) {
+          markerRef.current = new mapboxgl.Marker()
+            .setLngLat([longitude, latitude])
+            .addTo(map)
+        } else {
+          marker.setLngLat([longitude, latitude])
+        }
+      } else if (marker) {
+        marker.remove()
+        markerRef.current = null
+      }
     },
     [location]
   )
@@ -88,10 +106,7 @@ const Map = ({ bounds, grid, location }) => {
 
   return (
     <Relative>
-      <Absolute
-      //   mt={['2rem', '2.5rem', '2.75rem']}
-      //   ml={[0, '12rem', '16rem', '18rem']}
-      >
+      <Absolute>
         <div ref={mapNode} style={{ width: '100%', height: '100%' }} />
       </Absolute>
     </Relative>

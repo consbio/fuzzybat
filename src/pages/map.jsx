@@ -18,15 +18,19 @@ const MapPage = () => {
 
   console.log('map page render')
 
-  const handleSelectGrid = id => {
+  const handleSetGrid = id => {
     setGrid(id)
+  }
+
+  const handleSetLocation = newLocation => {
+    setLocation(newLocation)
   }
 
   return (
     <Layout>
       <SEO title="Home" />
       <Wrapper>
-        <Sidebar selectGrid={handleSelectGrid} />
+        <Sidebar selectGrid={handleSetGrid} setLocation={handleSetLocation} />
         <Map grid={grid} location={location} />
       </Wrapper>
     </Layout>

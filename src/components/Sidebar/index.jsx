@@ -10,21 +10,31 @@ const Wrapper = styled.div`
   padding: 1rem;
 `
 
-const Sidebar = ({ selectGrid }) => {
+const Sidebar = ({ selectGrid, setLocation }) => {
   const handleSelectGrid = () => {
     selectGrid('foo')
+  }
+
+  const handleSetLocation = () => {
+    setLocation({
+      latitude: Math.min(Math.random() * 10, 80),
+      longitude: Math.min(Math.random() * 100, 180),
+    })
   }
 
   return (
     <Wrapper>
       <p>sidebar content goes here</p>
-      <Button variant="primary" onClick={handleSelectGrid}>
+      <Button variant="primary" onClick={handleSetLocation}>
         Click me
       </Button>
     </Wrapper>
   )
 }
 
-Sidebar.propTypes = { selectGrid: PropTypes.func.isRequired }
+Sidebar.propTypes = {
+  selectGrid: PropTypes.func.isRequired,
+  setLocation: PropTypes.func.isRequired,
+}
 
 export default Sidebar
