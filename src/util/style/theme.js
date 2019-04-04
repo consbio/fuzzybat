@@ -1,7 +1,3 @@
-/**
- * This is our custom theme where we define global styles.
- * It should serve as a guideline for styling, but not all styles *have* to be taken from here.
- */
 const breakpoints = ['40em', '52em', '64em']
 
 /**
@@ -69,15 +65,8 @@ const colors = {
   },
 }
 
-/**
- * Space is used for margin and padding scales.
- * It's recommended to use powers of two to ensure alignment across the entire project
- */
 const space = [0, 4, 8, 16, 32, 64, 128, 256, 512]
 
-/**
- * Typographic scale
- */
 const fontSizes = [12, 14, 16, 20, 24, 32, 48, 64, 96, 128]
 
 const lineHeights = [1, 1.125, 1.25, 1.5]
@@ -101,10 +90,18 @@ const letterSpacings = {
  */
 const radii = [0, 2, 4, 8, 16]
 
+const buttons = {
+  primary: {
+    color: '#fff',
+    backgroundColor: colors.primary[600],
+  },
+}
+
 export const theme = {
   name: 'Default',
   breakpoints,
   colors,
+  buttons,
   space,
   fontSizes,
   lineHeights,

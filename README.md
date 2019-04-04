@@ -1,20 +1,39 @@
-<p align="center">
-  <a href="https://github.com/gregoralbrecht/gatsby-starter-styled">
-    <img alt="gatsby-starter-styled" src="src/images/favicon.png" width="80px" />
-  </a>
-</p>
-<h1 align="center">
-  gatsby-starter-styled
-</h1>
+# A simple tool for fuzzing coordinates of bat monitoring locations
 
-Yet another Gatsby starter boilerplate. I built this for my personal use, but maybe someone finds it helpful.
+## Data preparation
 
-## Features
+10 km and 50 km grids downloaded from [here](https://www.sciencebase.gov/catalog/item/5b5a164ce4b0610d7f4dcb8c).
 
-All the Gatsby goodness included in most other starters (SEO, [offline support](https://github.com/gatsbyjs/gatsby/tree/master/packages/gatsby-plugin-offline), [Web App Manifest](https://github.com/gatsbyjs/gatsby/tree/master/packages/gatsby-plugin-manifest), etc.) plus:
+Country boundaries were downloaded from [here](https://www.naturalearthdata.com/downloads/10m-cultural-vectors/).
 
-- [Styled-Components](https://github.com/styled-components/styled-components)
-- [Styled-System](https://github.com/jxnblk/styled-system) with [Rebass Grid](https://github.com/rebassjs/grid)
-- [Typography.js](https://kyleamathews.github.io/typography.js/) to easily set up font styles. If you want to add a custom font, I'd recommend self-hosting it with [Typefaces](https://github.com/KyleAMathews/typefaces)
-- Google Analytics with both [gatsby-plugin-google-analytics](https://www.gatsbyjs.org/packages/gatsby-plugin-google-analytics/) and [react-ga](https://github.com/react-ga/react-ga) for more control over custom events
-- Decent DX through opinionated linting with [Prettier](https://github.com/prettier/prettier), [ESLint](https://github.com/eslint/eslint) and [Stylelint](https://github.com/stylelint/stylelint)
+North America boundary: US, Mexico, and Canada boundaries were selected, dissolved, and buffered by 50km (geodesic) using ArcGIS.
+
+Reproject everything to WGS84 using `ogr2ogr` (much faster than in geopandas). In `grids/source` folder:
+
+```
+ogr2ogr -t_srs EPSG:4326 conus_50km_wgs84.shp conus_mastersample_50km.shp
+ogr2ogr -t_srs EPSG:4326 akcan_50km_wgs84.shp akcan_mastersample_50km.shp
+ogr2ogr -t_srs EPSG:4326 mex_50km_wgs84.shp mex_mastersample_50km.shp
+ogr2ogr -t_srs EPSG:4326 hi_50km_wgs84.shp hi_mastersample_50km.shp
+ogr2ogr -t_srs EPSG:4326 pr_50km_wgs84.shp pr_mastersample_50km.shp
+
+ogr2ogr -t_srs EPSG:4326 conus_10km_wgs84.shp conus_mastersample_10km.shp
+ogr2ogr -t_srs EPSG:4326 akcan_10km_wgs84.shp akcan_mastersample_10km.shp
+ogr2ogr -t_srs EPSG:4326 mex_10km_wgs84.shp mex_mastersample_10km.shp
+ogr2ogr -t_srs EPSG:4326 hi_10km_wgs84.shp hi_mastersample_10km.shp
+ogr2ogr -t_srs EPSG:4326 pr_10km_wgs84.shp pr_mastersample_10km.shp
+
+```
+
+Convert to tiles. In root data folder
+
+```
+tippecanoe -f -Z5 -z8 -l na_10km -o tiles/na_10km.mbtiles grids/derived/na_10km_wgs84.json
+tippecanoe -f -Z1 -z6 -l na_50km -o tiles/na_50km.mbtiles grids/derived/na_50km_wgs84.json
+```
+
+## Boundaries
+
+Canadian electoral districts obtained from: https://www12.statcan.gc.ca/census-recensement/2011/geo/bound-limit/bound-limit-2011-eng.cfm (cartographic boundaries)
+
+Mexican electoral districts obtained from: http://www.electiondataarchive.org/datacenter-gred.php

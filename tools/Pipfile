@@ -1,0 +1,23 @@
+[[source]]
+
+url = "https://pypi.python.org/simple"
+verify_ssl = true
+name = "pypi"
+
+
+[packages]
+
+pandas = "*"
+geopandas = "*"
+pylint = "*"
+black = "==19.3b0"
+rtree = "*"
+
+
+[dev-packages]
+
+
+
+[requires]
+
+python_version = "3.6"

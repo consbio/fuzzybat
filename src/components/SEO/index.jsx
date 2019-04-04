@@ -13,7 +13,7 @@ function SEO({ description, lang, meta, title }) {
       url: config.siteUrl,
       name: title,
       description: config.siteDescription,
-      alternateName: config.siteTitleAlt ? config.siteTitleAlt : '',
+      alternateName: '',
       author: {
         '@type': `Person`,
         name: config.schema.author,

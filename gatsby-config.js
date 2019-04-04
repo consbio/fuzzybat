@@ -28,12 +28,6 @@ module.exports = {
         pathToConfigModule: `./config/typography.js`,
       },
     },
-    {
-      resolve: `gatsby-plugin-lodash`,
-      options: {
-        disabledFeatures: [`shorthands`, `cloning`, `currying`],
-      },
-    },
     `gatsby-plugin-catch-links`,
     `gatsby-plugin-sitemap`,
     {
@@ -43,19 +37,19 @@ module.exports = {
         anonymize: true,
       },
     },
-    {
-      resolve: `gatsby-plugin-manifest`,
-      options: {
-        name: config.siteTitle,
-        short_name: config.siteTitleShort,
-        description: config.siteDescription,
-        start_url: `/?utm_source=a2hs`,
-        background_color: config.manifest.backgroundColor,
-        theme_color: config.manifest.themeColor,
-        display: `standalone`,
-        icon: `src/images/favicon.png`,
-      },
-    },
-    `gatsby-plugin-offline`,
+    // {
+    //   resolve: `gatsby-plugin-manifest`,
+    //   options: {
+    //     name: config.siteTitle,
+    //     short_name: config.siteTitleShort,
+    //     description: config.siteDescription,
+    //     start_url: `/?utm_source=a2hs`,
+    //     background_color: config.manifest.backgroundColor,
+    //     theme_color: config.manifest.themeColor,
+    //     display: `standalone`,
+    //     icon: `src/images/favicon.png`,
+    //   },
+    // },
+    // `gatsby-plugin-offline`,
   ],
 }
