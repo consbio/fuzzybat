@@ -21,6 +21,7 @@ const IndexPage = ({ data: { headerImage } }) => (
       image={headerImage.childImageSharp.fluid}
       height="20vh"
       minHeight="16rem"
+      position="bottom"
       credits={{
         url:
           'https://www.flickr.com/photos/usfwshq/9413217529/in/album-72157634888764844/',
@@ -46,9 +47,9 @@ const IndexPage = ({ data: { headerImage } }) => (
       </ul>
 
       <BodyText>
-        This tool will help you "fuzz" the coordinates of your bat monitoring
-        location, so that you can more easily share your data with other
-        monitoring efforts.
+        This tool will help you &quot;fuzz&quot; the coordinates of your bat
+        monitoring location, so that you can more easily share your data with
+        other monitoring efforts.
         <br />
         <br />
         You can also use this tool to find the monitoring grid cell ID for your
@@ -69,7 +70,7 @@ IndexPage.propTypes = {
 }
 
 export const pageQuery = graphql`
-  query NotFoundPageQuery {
+  query HomePageQuery {
     headerImage: file(relativePath: { eq: "9413217529_c1f7f7cc01_o_d.jpg" }) {
       childImageSharp {
         fluid(maxWidth: 3200) {

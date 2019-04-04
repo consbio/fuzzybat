@@ -5,6 +5,7 @@
   "version": "0.1.0",
   "author": "Brendan C. Ward <bcward@consbio.org>",
   "dependencies": {
+    "@mapbox/geo-viewport": "^0.4.0",
     "@rebass/grid": "^6.0.0",
     "babel-plugin-styled-components": "^1.10.0",
     "gatsby": "^2.3.6",

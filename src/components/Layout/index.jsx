@@ -1,20 +1,25 @@
 import React from 'react'
 import PropTypes from 'prop-types'
-import { ThemeProvider, theme } from 'util/style'
+import styled, { ThemeProvider, theme } from 'util/style'
 
 import Header from 'components/Header'
-// import Footer from 'components/Footer'
-import { Box, Container } from 'components/Grid'
-
+import { Flex } from 'components/Grid'
 import config from '../../../config/meta'
+
+const Wrapper = styled(Flex).attrs({ flexDirection: 'column' })`
+  height: 100%;
+`
+
+const Content = styled.div`
+  flex: 1 1 auto;
+`
 
 const Layout = ({ children }) => (
   <ThemeProvider theme={theme}>
-    <>
+    <Wrapper>
       <Header siteTitle={config.siteTitle} />
-      {children}
-      <Container maxWidth="100%">{/* <Footer /> */}</Container>
-    </>
+      <Content>{children}</Content>
+    </Wrapper>
   </ThemeProvider>
 )
 

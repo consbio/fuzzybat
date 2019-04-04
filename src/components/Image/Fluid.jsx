@@ -1,6 +1,7 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 import Img from 'gatsby-image'
+import { css } from 'styled-components'
 
 import styled from 'util/style'
 
@@ -8,7 +9,6 @@ const Wrapper = styled.div`
   margin-top: 0;
   height: ${({ height }) => height};
   min-height: ${({ minHeight }) => minHeight};
-  overflow: hidden;
   width: 100%;
   position: relative;
   overflow: hidden;
@@ -16,10 +16,35 @@ const Wrapper = styled.div`
 
 const StyledImage = styled(Img)`
   position: absolute !important;
-  bottom: 0;
-  top: 0;
   left: 0;
   right: 0;
+bottom: 0;
+top: 0;
+  img {
+    object-position: center ${({ position }) => position} !important;
+  }
+
+/*
+  ${({ position }) => {
+    switch (position) {
+      case 'top': {
+        return css`
+          top: 0;
+        `
+      }
+      case 'bottom': {
+        return css`
+          bottom: 0;
+        `
+      }
+      default: {
+        return css`
+          bottom: 0;
+          top: 0;
+        `
+      }
+    }
+  }}*/
 `
 
 const ImageCredits = styled.div`
@@ -28,10 +53,10 @@ const ImageCredits = styled.div`
   margin-right: 1rem;
 `
 
-const Fluid = ({ image, height, minHeight, credits }) => (
+const Fluid = ({ image, height, minHeight, credits, position }) => (
   <>
     <Wrapper height={height} minHeight={minHeight}>
-      <StyledImage fluid={image} />
+      <StyledImage fluid={image} position={position} />
     </Wrapper>
     {credits ? (
       <ImageCredits>
@@ -52,12 +77,14 @@ Fluid.propTypes = {
     url: PropTypes.string.isRequired,
     author: PropTypes.string.isRequired,
   }),
+  position: PropTypes.string,
 }
 
 Fluid.defaultProps = {
   height: '60vh',
   minHeight: '20rem',
   credits: null,
+  position: 'center',
 }
 
 export default Fluid
