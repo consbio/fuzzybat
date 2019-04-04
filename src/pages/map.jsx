@@ -30,7 +30,11 @@ const MapPage = () => {
     <Layout>
       <SEO title="Home" />
       <Wrapper>
-        <Sidebar selectGrid={handleSetGrid} setLocation={handleSetLocation} />
+        <Sidebar
+          grid={grid}
+          selectGrid={handleSetGrid}
+          setLocation={handleSetLocation}
+        />
         <Map grid={grid} location={location} />
       </Wrapper>
     </Layout>
