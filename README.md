@@ -25,11 +25,13 @@ ogr2ogr -t_srs EPSG:4326 pr_10km_wgs84.shp pr_mastersample_10km.shp
 
 ```
 
-Convert to tiles. In root data folder
+Convert to tiles. In root data folder:
 
 ```
-tippecanoe -f -Z5 -z8 -l na_10km -o tiles/na_10km.mbtiles grids/derived/na_10km_wgs84.json
-tippecanoe -f -Z1 -z6 -l na_50km -o tiles/na_50km.mbtiles grids/derived/na_50km_wgs84.json
+tippecanoe -f -Z5 -z8 --no-tile-stats --use-attribute-for-id id -l na_10km -o tiles/na_10km.mbtiles grids/derived/na_10km_wgs84.json
+tippecanoe -f -Z1 -z8 --no-tile-stats --use-attribute-for-id id -l na_50km -o tiles/na_50km.mbtiles grids/derived/na_50km_wgs84.json
+
+tile-join -f --no-tile-stats -o tiles/grids.mbtiles tiles/na_10km.mbtiles tiles/na_50km.mbtiles
 ```
 
 ## Boundaries

@@ -72,8 +72,8 @@ const Sidebar = ({ grid, selectGrid, setLocation }) => {
           </Button>
           <Button
             {...buttonProps}
-            primary={grid === '50km'}
-            onClick={() => selectGrid('50km')}
+            primary={grid === 'na_50km'}
+            onClick={() => selectGrid('na_50km')}
           >
             50km
           </Button>

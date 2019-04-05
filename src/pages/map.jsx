@@ -16,7 +16,7 @@ const MapPage = () => {
   const [grid, setGrid] = useState(null)
   const [location, setLocation] = useState(null)
 
-  console.log('map page render')
+  console.log('map page render', grid)
 
   const handleSetGrid = id => {
     setGrid(id)
