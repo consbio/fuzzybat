@@ -15,6 +15,7 @@ const Wrapper = styled(Flex)`
 const MapPage = () => {
   const [grid, setGrid] = useState(null)
   const [location, setLocation] = useState(null)
+  const [selectedFeature, setSelectedFeature] = useState(null)
 
   console.log('map page render', grid)
 
@@ -26,16 +27,25 @@ const MapPage = () => {
     setLocation(newLocation)
   }
 
+  const handleSelectFeature = feature => {
+    setSelectedFeature(feature)
+  }
+
   return (
     <Layout>
       <SEO title="Home" />
       <Wrapper>
         <Sidebar
           grid={grid}
+          selectedFeature={selectedFeature}
           selectGrid={handleSetGrid}
           setLocation={handleSetLocation}
         />
-        <Map grid={grid} location={location} />
+        <Map
+          grid={grid}
+          location={location}
+          onSelectFeature={handleSelectFeature}
+        />
       </Wrapper>
     </Layout>
   )

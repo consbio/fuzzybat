@@ -1,7 +1,8 @@
-import React from 'react'
+import React, { useState } from 'react'
 import PropTypes from 'prop-types'
+import { css } from 'styled-components'
 
-import { Flex } from 'components/Grid'
+import { Box, Flex } from 'components/Grid'
 import { Button, ButtonGroup } from 'components/Button'
 import styled, { themeGet } from 'util/style'
 
@@ -13,6 +14,7 @@ const Wrapper = styled.div`
 `
 
 const Step = styled.div`
+  flex: 0 0 auto;
   height: 2rem;
   width: 2rem;
   text-align: center;
@@ -31,20 +33,106 @@ const Section = styled.section`
   }
 `
 
+const ResultsSection = styled(Section)`
+  padding: 1rem !important;
+  background-color: ${themeGet('colors.primary.100')};
+  border-radius: 1rem;
+  border: 1px solid ${themeGet('colors.primary.200')} !important;
+`
+
 const SectionHeader = styled(Flex).attrs({ alignItems: 'center' })`
   font-size: 1.3rem;
   font-weight: bold;
+  line-height: 1.1;
 `
 
 const StyledButtonGroup = styled(ButtonGroup)`
-  margin-top: 2rem;
+  margin-top: 1rem;
 `
 
-const Sidebar = ({ grid, selectGrid, setLocation }) => {
-  const handleSetLocation = () => {
+const Row = styled(Flex).attrs({ justifyContent: 'space-between' })`
+  border-bottom: 1px solid ${themeGet('colors.white')};
+  padding: 0.25em 1em;
+`
+
+const HelpText = styled.p`
+  color: ${themeGet('colors.grey.400')};
+  font-size: smaller;
+  font-style: italic;
+`
+
+const Label = styled.span`
+color: ${themeGet('colors.grey.700')};
+margin-right
+`
+
+const Value = styled.div``
+
+const FieldHeader = styled.h4`
+  margin-bottom: 0.5em;
+  text-align: center;
+`
+
+const Input = styled.input.attrs({
+  type: 'number',
+})`
+  padding: 0.25em 0.5em;
+  outline: none;
+  width: 100%;
+  border-radius: 8px;
+  border: 1px solid ${themeGet('colors.primary.200')};
+  transition: border-color 0.25s linear;
+  &:focus {
+    border-color: ${themeGet('colors.primary.600')};
+  }
+
+  ${({ invalid }) =>
+    invalid &&
+    css`
+      border-color: ${themeGet('colors.secondary.500')} !important;
+      background-color: ${themeGet('colors.secondary.200')};
+    `}
+`
+
+const Sidebar = ({
+  grid,
+  selectedFeature,
+  selectGrid,
+  setLocation: submitLocation,
+}) => {
+  const [location, setLocation] = useState({
+    latitude: '',
+    longitude: '',
+    isLatValid: true,
+    isLongValid: true,
+  })
+
+  const { latitude, longitude, isLatValid, isLongValid } = location
+
+  const canSubmit =
+    isLatValid && isLongValid && latitude !== '' && longitude !== ''
+
+  const handleSubmitLocation = () => {
+    if (canSubmit) {
+      submitLocation({
+        latitude: parseFloat(latitude),
+        longitude: parseFloat(longitude),
+      })
+    }
+  }
+
+  const handleLatitudeChange = ({ target: { value } }) => {
     setLocation({
-      latitude: Math.min(Math.random() * 10, 80),
-      longitude: Math.min(Math.random() * 100, 180),
+      ...location,
+      latitude: value,
+      isLatValid: value === '' || Math.abs(parseFloat(value)) < 89,
+    })
+  }
+  const handleLongitudeChange = ({ target: { value } }) => {
+    setLocation({
+      ...location,
+      longitude: value,
+      isLongValid: value === '' || Math.abs(parseFloat(value)) <= 180,
     })
   }
 
@@ -52,14 +140,12 @@ const Sidebar = ({ grid, selectGrid, setLocation }) => {
     secondary: grid === null,
   }
 
-  console.log(grid)
-
   return (
     <Wrapper>
       <Section>
         <SectionHeader>
           <Step>1</Step>
-          <div>Select Grid</div>
+          <div>Select Grid:</div>
         </SectionHeader>
 
         <StyledButtonGroup justifyContent="center">
@@ -77,40 +163,101 @@ const Sidebar = ({ grid, selectGrid, setLocation }) => {
           >
             50km
           </Button>
-          {/* <Button
-            {...buttonProps}
-            primary={grid === '100km'}
-            onClick={() => selectGrid('100km')}
-          >
-            100km
-          </Button> */}
         </StyledButtonGroup>
       </Section>
 
-      <Section>
-        <SectionHeader>
-          <Step>2</Step>
-          <div>Enter coordinates</div>
-        </SectionHeader>
+      {grid && (
+        <Section>
+          <SectionHeader>
+            <Step>2</Step>
+            <div>Click on Map or Enter Coordinates:</div>
+          </SectionHeader>
 
-        <Flex justifyContent="flex-end">
-          <Button primary onClick={handleSetLocation}>
-            Go to location
-          </Button>
-        </Flex>
-      </Section>
+          <HelpText style={{ textAlign: 'center', margin: 0 }}>
+            Decimal degrees only.
+          </HelpText>
+
+          <Flex alignItems="center" justifyContent="space-between" m="0 0 2rem">
+            <Box flex="1 1 auto" p="0.5rem">
+              <FieldHeader>Latitude</FieldHeader>
+              <Input
+                type="number"
+                value={latitude}
+                onChange={handleLatitudeChange}
+                invalid={!isLatValid}
+              />
+            </Box>
+
+            <Box flex="1 1 auto">
+              <FieldHeader>Longitude</FieldHeader>
+              <Input
+                type="number"
+                value={longitude}
+                onChange={handleLongitudeChange}
+                invalid={!isLongValid}
+              />
+            </Box>
+          </Flex>
+
+          <Flex justifyContent="flex-end">
+            <Button
+              primary={canSubmit}
+              disabled={!canSubmit}
+              onClick={handleSubmitLocation}
+            >
+              Go to location
+            </Button>
+          </Flex>
+        </Section>
+      )}
+
+      {selectedFeature && (
+        <>
+          <ResultsSection>
+            <SectionHeader>Selected Grid Cell:</SectionHeader>
+            <Row>
+              <Label>Sampling frame:</Label>
+              <Value>
+                {selectedFeature.source.toUpperCase()}_
+                {grid.replace('na_', '').toUpperCase()}
+              </Value>
+            </Row>
+
+            <Row>
+              <Label>Grid Cell ID:</Label>
+              <Value>{selectedFeature.id}</Value>
+            </Row>
+
+            <Row>
+              <Label>Center latitude:</Label>
+              <Value>{selectedFeature.lat}</Value>
+            </Row>
+
+            <Row>
+              <Label>Center longitude:</Label>
+              <Value>{selectedFeature.long}</Value>
+            </Row>
+          </ResultsSection>
+        </>
+      )}
     </Wrapper>
   )
 }
 
 Sidebar.propTypes = {
   grid: PropTypes.string,
+  selectedFeature: PropTypes.shape({
+    id: PropTypes.number.isRequired,
+    lat: PropTypes.number.isRequired,
+    long: PropTypes.number.isRequired,
+  }),
   selectGrid: PropTypes.func.isRequired,
   setLocation: PropTypes.func.isRequired,
 }
 
 Sidebar.defaultProps = {
   grid: null,
+  selectedFeature: null,
 }
 
 export default Sidebar

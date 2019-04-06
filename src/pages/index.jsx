@@ -1,9 +1,9 @@
 import React from 'react'
 import PropTypes from 'prop-types'
-import { graphql } from 'gatsby'
-import { Button } from 'rebass'
+import { graphql, navigate } from 'gatsby'
 
-import { Link, OutboundLink } from 'components/Link'
+import { OutboundLink } from 'components/Link'
+import { Button } from 'components/Button'
 import Layout from 'components/Layout'
 import SEO from 'components/SEO'
 import { FluidImage } from 'components/Image'
@@ -57,7 +57,9 @@ const IndexPage = ({ data: { headerImage } }) => (
       </BodyText>
 
       <Container style={{ textAlign: 'center' }}>
-        <Button variant="primary">Get Started</Button>
+        <Button primary onClick={() => navigate('/map')}>
+          Get Started
+        </Button>
       </Container>
     </Container>
   </Layout>

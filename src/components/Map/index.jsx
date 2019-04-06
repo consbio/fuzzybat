@@ -37,8 +37,6 @@ const Map = ({ bounds, grid, location, onSelectFeature }) => {
   gridRef.current = grid
 
   useEffect(() => {
-    console.log('construct map')
-
     let center = null
     let zoom = null
 
@@ -77,8 +75,6 @@ const Map = ({ bounds, grid, location, onSelectFeature }) => {
 
       // add layers
       layers.forEach(layer => {
-        console.log('adding layer', layer)
-
         // add highlight layer for each
         const highlightLayer = fromJS(layer)
           .merge({
@@ -93,6 +89,7 @@ const Map = ({ bounds, grid, location, onSelectFeature }) => {
           .toJS()
         map.addLayer(highlightLayer)
 
+        // add layer last so that outlines are on top of highlight
         map.addLayer(layer)
       })
     })
@@ -162,13 +159,6 @@ const Map = ({ bounds, grid, location, onSelectFeature }) => {
           grid === id ? 'visible' : 'none'
         )
       })
-
-      //   if (grid) {
-      //     map.setLayoutProperty(grid, 'visibility', 'visible')
-      //   } else {
-      //     // hide all layers
-
-      //   }
     },
     [grid]
   )
