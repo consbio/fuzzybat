@@ -90,6 +90,8 @@ const Map = ({ bounds, grid, location, onSelectFeature }) => {
         map.addLayer(highlightLayer)
 
         // add layer last so that outlines are on top of highlight
+        /* eslint-disable no-param-reassign */
+        layer.layout.visibility = grid === layer.id ? 'visible' : 'none'
         map.addLayer(layer)
       })
     })
@@ -122,8 +124,20 @@ const Map = ({ bounds, grid, location, onSelectFeature }) => {
       if (!map.loaded()) return
 
       if (location !== null) {
+        onSelectFeature(null)
         const { latitude, longitude } = location
         map.flyTo({ center: [longitude, latitude], zoom: 10 })
+
+        map.once('moveend', () => {
+          const point = map.project([longitude, latitude])
+          const feature = getFeatureAtPoint(point)
+          // source may still be loading, try again in 1 second
+          if (!feature) {
+            setTimeout(() => {
+              getFeatureAtPoint(point)
+            }, 1000)
+          }
+        })
 
         if (!marker) {
           markerRef.current = new mapboxgl.Marker()
@@ -178,6 +192,23 @@ const Map = ({ bounds, grid, location, onSelectFeature }) => {
     } else {
       map.setPaintProperty(layer, 'fill-color', TRANSPARENT)
     }
+  }
+
+  const getFeatureAtPoint = point => {
+    const { current: map } = mapRef
+    const { current: curGrid } = gridRef
+
+    if (!(map && curGrid)) return null
+
+    const [feature] = map.queryRenderedFeatures(point, {
+      layers: [`${curGrid}-highlight`],
+    })
+    if (feature) {
+      console.log('got feature at point', feature)
+      updateHighlight(curGrid, feature.properties.id)
+      onSelectFeature(feature.properties)
+    }
+    return feature
   }
 
   return (

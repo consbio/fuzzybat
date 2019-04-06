@@ -150,8 +150,9 @@ const Sidebar = ({
 
         <StyledButtonGroup justifyContent="center">
           <Button
-            {...buttonProps}
-            primary={grid === 'grts'}
+            disabled
+            // {...buttonProps}
+            // primary={grid === 'grts'}
             onClick={() => selectGrid('grts')}
           >
             GRTS (5-10km)
@@ -162,6 +163,14 @@ const Sidebar = ({
             onClick={() => selectGrid('na_50km')}
           >
             50km
+          </Button>
+          <Button
+            disabled
+            // {...buttonProps}
+            // primary={grid === 'na_100km'}
+            onClick={() => selectGrid('na_100km')}
+          >
+            100km
           </Button>
         </StyledButtonGroup>
       </Section>
@@ -177,7 +186,7 @@ const Sidebar = ({
             Decimal degrees only.
           </HelpText>
 
-          <Flex alignItems="center" justifyContent="space-between" m="0 0 2rem">
+          <Flex alignItems="center" justifyContent="space-between" mb="1rem">
             <Box flex="1 1 auto" p="0.5rem">
               <FieldHeader>Latitude</FieldHeader>
               <Input
@@ -188,7 +197,7 @@ const Sidebar = ({
               />
             </Box>
 
-            <Box flex="1 1 auto">
+            <Box flex="1 1 auto" p="0.5rem">
               <FieldHeader>Longitude</FieldHeader>
               <Input
                 type="number"

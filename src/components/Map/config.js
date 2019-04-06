@@ -1,12 +1,12 @@
-const TILE_HOST = 'http://localhost:8001'
+const TILE_HOST = 'https://tiles.batamp.databasin.org'
 
 const config = {
   // Mapbox public token.  TODO: migrate to .env setting
   accessToken:
     'pk.eyJ1IjoiYmN3YXJkIiwiYSI6InJ5NzUxQzAifQ.CVyzbyOpnStfYUQ_6r8AgQ',
-  center: [0, 0],
-  zoom: 0,
-  minZoom: 1,
+  center: [-91.426, 51.711],
+  zoom: 2.3,
+  minZoom: 1.75,
   styleID: 'light-v9',
   padding: 0.1, // padding around bounds as a proportion
   sources: {

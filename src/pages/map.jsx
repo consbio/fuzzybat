@@ -13,7 +13,7 @@ const Wrapper = styled(Flex)`
 `
 
 const MapPage = () => {
-  const [grid, setGrid] = useState(null)
+  const [grid, setGrid] = useState('na_50km')
   const [location, setLocation] = useState(null)
   const [selectedFeature, setSelectedFeature] = useState(null)
 
@@ -21,6 +21,7 @@ const MapPage = () => {
 
   const handleSetGrid = id => {
     setGrid(id)
+    setSelectedFeature(null)
   }
 
   const handleSetLocation = newLocation => {
