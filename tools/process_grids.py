@@ -21,91 +21,105 @@ NA_BOUNDS = [
     -50,
     83,
 ]  # Approx bounds of North America, ignoring the far north
-FILENAME_PATTERN = "{grid}_{size}km_wgs84.shp"
-ID_PATTERN = "{grid}_{size}KM"
+FILENAME_PATTERN = "{frame}_{size}km_wgs84.shp"
+ID_PATTERN = "{frame}_{size}KM"
 
 src_dir = "../../data/batamp/grids/source"
-out_dir = "../../data/batamp/grids/derived"
+derived_dir = "../../data/batamp/grids/derived"
+out_dir = "../../data/batamp/grids/final"
 boundary_dir = "../../data/batamp/boundaries/derived"
 
 
-# Load North America buffer and get rid of areas far away
-na_df = gp.read_file(os.path.join(boundary_dir, "NorthAmerica_50km_buffer.shp"))
-na_df = na_df.cx[slice(*NA_BOUNDS[:3:2]), slice(*NA_BOUNDS[1::2])]
-na_df.sindex
-
-
-size = 10
-
-conus = None
+### Merge GRTS grids together
+frames = ("ak", "can", "mex", "conus", "hi", "pr")
+sizes = (10, 10, 10, 10, 5, 5)
 merged = None
-for grid in ("conus", "akcan", "mex", "hi", "pr"):
-    print("reading {}".format(grid))
+for frame, size in zip(frames, sizes):
+    print("Reading {}...".format(frame))
     df = gp.read_file(
-        os.path.join(src_dir, FILENAME_PATTERN.format(grid=grid, size=size))
+        os.path.join(derived_dir, FILENAME_PATTERN.format(frame=frame, size=size))
     )
-    colmap = dict()
-    colmap[ID_PATTERN.format(grid=grid.upper(), size=size)] = "id"
-    df = df.rename(columns=colmap)
-    df["source"] = grid
+    df["id"] = df.GRTS_ID
+    src_id_field = ID_PATTERN.format(
+        frame="AKCAN" if frame in ("ak", "can") else frame.upper(), size=size
+    )
 
-    if grid == "akcan":
-        # crop to bounds of north america and get rid of bad geometries
-        df = df.cx[slice(*NA_BOUNDS[:3:2]), slice(*NA_BOUNDS[1::2])]
+    # standardize source attributes for easier merging
+    df["src"] = src_id_field
+    df["src_id"] = df[src_id_field]
+    df = df.drop(columns=[src_id_field])
 
-        # there are bad geometries that wrap the antimeridian
-        # select these using their centerpoint, and ignore them
-        df = df.loc[(df.long >= NA_BOUNDS[0]) & (df.long <= NA_BOUNDS[2])]
-
-    if grid == "conus":
-        conus = df
-
+    if merged is None:
+        merged = df
     else:
-        if merged is None:
-            merged = df
-        else:
-            merged = merged.append(df, sort=False, ignore_index=True)
-
-
-# get bounding rectangle of conus
-conus_outer = GeoDataFrame(geometry=GeoSeries(conus.unary_union))
-
-# cut conus from merged
-print("Cutting CONUS out of others...")
-merged.sindex
-conus_outer.sindex
-merged = gp.overlay(merged, conus_outer, how="difference")
-
-# merge in conus
-print("Merging CONUS in...")
-merged = merged.append(conus, sort=False, ignore_index=True).reindex()
-merged.sindex
-
-
-# Construct points and select out those that fall in North America
-print("Clipping to North America")
-points = merged.copy()
-points["point"] = points.apply(lambda row: Point(row.long, row.lat), axis=1)
-points = points.set_geometry("point")[["point"]]
-
-merged = merged[points.within(na_df.unary_union)]
-
-# extract within North America
-# print("Clipping to North America")
-# clipped = gp.overlay(merged, na_df, how="intersection")
-# # use this to extract out the original grid cells that overlap
-# merged = merged.loc[clipped.index]
-
+        merged = merged.append(df, ignore_index=True, sort=False)
 
 # For testing
 print("Writing shapefile...")
-merged.to_file(os.path.join(out_dir, "na_{}km_wgs84.shp".format(size)))
+merged.to_file(os.path.join(out_dir, "na_grts_wgs84.shp"))
 
 print("Writing GeoJSON...")
-filename = os.path.join(out_dir, "na_{}km_wgs84.json".format(size))
-
-# JSON cannot be overwritten
+filename = os.path.join(out_dir, "na_grts_wgs84.json")
+# JSON cannot be overwritten, so delete it first
 if os.path.exists(filename):
     os.remove(filename)
-
 merged.to_file(filename, driver="GeoJSON")
+
+### Do a spatial join of GRTS grids to 50k grids
+# We did not use the master frame lookup of 10k -> 50k because the IDs were not correct for this version of the 50k grids
+
+merged = None
+for frame, size in zip(frames, sizes):
+    print("Reading {}...".format(frame))
+
+    is_AK_CAN = frame in ("ak", "can")
+    frame_name = "AKCAN" if is_AK_CAN else frame.upper()
+    src_id_field = ID_PATTERN.format(frame=frame_name, size=size)
+    parent_id_field = ID_PATTERN.format(frame=frame_name, size=50)
+
+    grts_df = gp.read_file(
+        os.path.join(derived_dir, FILENAME_PATTERN.format(frame=frame, size=size))
+    )
+
+    points = gp.GeoDataFrame(geometry=grts_df.centroid)
+
+    print("Reading parent grid")
+    df = gp.read_file(
+        os.path.join(derived_dir, FILENAME_PATTERN.format(frame=frame_name, size=50))
+    )
+
+    # Note: AKCAN grid has a multipolygon cell that needs to be exploded
+    df = df.explode().reindex().reset_index()
+
+    # Note: AKCAN grid has cells that wrap the dateline, get rid of these
+    if frame_name == "AKCAN":
+        df = df.loc[df.bounds.maxx < 0]
+
+    print("Spatial join...")
+    df = (
+        gp.sjoin(df, points, op="contains", how="left")
+        .dropna()
+        .drop_duplicates([parent_id_field])
+    )
+
+    # standardize ID fields
+    df["src"] = parent_id_field
+    df["src_id"] = df[parent_id_field]
+    df = df.drop(columns=[parent_id_field])
+
+    if merged is None:
+        merged = df
+    else:
+        merged = merged.append(df, ignore_index=True, sort=False)
+
+# For testing
+print("Writing shapefile...")
+merged.to_file(os.path.join(out_dir, "na_50km_wgs84.shp"))
+
+print("Writing GeoJSON...")
+filename = os.path.join(out_dir, "na_50km_wgs84.json")
+# JSON cannot be overwritten, so delete it first
+if os.path.exists(filename):
+    os.remove(filename)
+merged.to_file(filename, driver="GeoJSON")
+
