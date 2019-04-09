@@ -9,6 +9,7 @@ import 'mapbox-gl/dist/mapbox-gl.css'
 import styled from 'util/style'
 import { hasWindow } from 'util/dom'
 import { getCenterAndZoom } from 'util/map'
+import { networkInterfaces } from 'os'
 import config from './config'
 
 const TRANSPARENT = 'rgba(0,0,0,0)'
@@ -16,6 +17,19 @@ const TRANSPARENT = 'rgba(0,0,0,0)'
 const Relative = styled.div`
   position: relative;
   flex: 1 0 auto;
+`
+
+const MapNote = styled.div`
+  position: absolute;
+  z-index: 1000;
+  top: 0;
+  left: 4rem;
+  right: 4rem;
+  // padding: 1rem;
+  background: rgba(255, 255, 255, 0.9);
+  text-align: center;
+  border-radius: 0 0 1rem 1rem;
+  box-shadow: 0 2px 6px #666;
 `
 
 const Map = ({ bounds, grid, location, onSelectFeature }) => {
@@ -29,6 +43,7 @@ const Map = ({ bounds, grid, location, onSelectFeature }) => {
   console.log('render map')
 
   const mapNode = useRef(null)
+  const noteNode = useRef(null)
   const markerRef = useRef(null)
   const mapRef = useRef(null)
   const gridRef = useRef(grid)
@@ -111,6 +126,16 @@ const Map = ({ bounds, grid, location, onSelectFeature }) => {
       }
     })
 
+    map.on('zoomend', () => {
+      console.log('zoom', map.getZoom())
+
+      if (gridRef.current === 'na_grts' && map.getZoom() < 5) {
+        noteNode.current.innerHTML = 'Zoom in further to see GRTS grid...'
+      } else {
+        noteNode.current.innerHTML = ''
+      }
+    })
+
     return () => {
       map.remove()
     }
@@ -173,6 +198,13 @@ const Map = ({ bounds, grid, location, onSelectFeature }) => {
           grid === id ? 'visible' : 'none'
         )
       })
+
+      // update zoom in note
+      if (gridRef.current === 'na_grts' && map.getZoom() < 5) {
+        noteNode.current.innerHTML = 'Zoom in further to see GRTS grid...'
+      } else {
+        noteNode.current.innerHTML = ''
+      }
     },
     [grid]
   )
@@ -213,6 +245,7 @@ const Map = ({ bounds, grid, location, onSelectFeature }) => {
 
   return (
     <Relative>
+      <MapNote ref={noteNode} />
       <div ref={mapNode} style={{ width: '100%', height: '100%' }} />
     </Relative>
   )

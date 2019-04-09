@@ -3,7 +3,7 @@ module.exports = {
   siteTitle: `BatAMP Grid Selection Tool`,
 
   siteTitleShort: `Gatsby Styled`,
-  siteDescription: `Kick off your next, great Gatsby project with this starter.`,
+  siteDescription: `BatAMP Grid Selection Tool.`,
   manifest: {
     themeColor: `#253688`,
     backgroundColor: `#253688`,

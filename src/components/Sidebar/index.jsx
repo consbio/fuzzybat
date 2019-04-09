@@ -5,6 +5,7 @@ import { css } from 'styled-components'
 import { Box, Flex } from 'components/Grid'
 import { Button, ButtonGroup } from 'components/Button'
 import styled, { themeGet } from 'util/style'
+import { formatNumber } from 'util/format'
 
 const Wrapper = styled.div`
   flex: 0 0 auto;
@@ -150,10 +151,9 @@ const Sidebar = ({
 
         <StyledButtonGroup justifyContent="center">
           <Button
-            disabled
-            // {...buttonProps}
-            // primary={grid === 'grts'}
-            onClick={() => selectGrid('grts')}
+            {...buttonProps}
+            primary={grid === 'na_grts'}
+            onClick={() => selectGrid('na_grts')}
           >
             GRTS (5-10km)
           </Button>
@@ -165,9 +165,8 @@ const Sidebar = ({
             50km
           </Button>
           <Button
-            disabled
-            // {...buttonProps}
-            // primary={grid === 'na_100km'}
+            {...buttonProps}
+            primary={grid === 'na_100km'}
             onClick={() => selectGrid('na_100km')}
           >
             100km
@@ -227,8 +226,7 @@ const Sidebar = ({
             <Row>
               <Label>Sampling frame:</Label>
               <Value>
-                {selectedFeature.source.toUpperCase()}_
-                {grid.replace('na_', '').toUpperCase()}
+                {grid === 'na_grts' ? 'NABat GRTS' : selectedFeature.src}
               </Value>
             </Row>
 
@@ -239,12 +237,12 @@ const Sidebar = ({
 
             <Row>
               <Label>Center latitude:</Label>
-              <Value>{selectedFeature.lat}</Value>
+              <Value>{formatNumber(selectedFeature.lat, 5)}</Value>
             </Row>
 
             <Row>
               <Label>Center longitude:</Label>
-              <Value>{selectedFeature.long}</Value>
+              <Value>{formatNumber(selectedFeature.long, 5)}</Value>
             </Row>
           </ResultsSection>
         </>
@@ -256,7 +254,7 @@ const Sidebar = ({
 Sidebar.propTypes = {
   grid: PropTypes.string,
   selectedFeature: PropTypes.shape({
-    id: PropTypes.number.isRequired,
+    id: PropTypes.string.isRequired,
     lat: PropTypes.number.isRequired,
     long: PropTypes.number.isRequired,
   }),

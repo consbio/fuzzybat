@@ -20,6 +20,7 @@ const MapPage = () => {
   console.log('map page render', grid)
 
   const handleSetGrid = id => {
+    if (id === grid) return // no-op
     setGrid(id)
     setSelectedFeature(null)
   }

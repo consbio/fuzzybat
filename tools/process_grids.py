@@ -32,37 +32,37 @@ boundary_dir = "../../data/batamp/boundaries/derived"
 ### Merge GRTS grids together
 frames = ("ak", "can", "mex", "conus", "hi", "pr")
 sizes = (10, 10, 10, 10, 5, 5)
-merged = None
-for frame, size in zip(frames, sizes):
-    print("Reading {}...".format(frame))
-    df = gp.read_file(
-        os.path.join(derived_dir, FILENAME_PATTERN.format(frame=frame, size=size))
-    )
-    df["id"] = df.GRTS_ID
-    src_id_field = ID_PATTERN.format(
-        frame="AKCAN" if frame in ("ak", "can") else frame.upper(), size=size
-    )
+# merged = None
+# for frame, size in zip(frames, sizes):
+#     print("Reading {}...".format(frame))
+#     df = gp.read_file(
+#         os.path.join(derived_dir, FILENAME_PATTERN.format(frame=frame, size=size))
+#     )
+#     df["id"] = df.GRTS_ID
+#     src_id_field = ID_PATTERN.format(
+#         frame="AKCAN" if frame in ("ak", "can") else frame.upper(), size=size
+#     )
 
-    # standardize source attributes for easier merging
-    df["src"] = src_id_field
-    df["src_id"] = df[src_id_field]
-    df = df.drop(columns=[src_id_field])
+#     # standardize source attributes for easier merging
+#     df["src"] = src_id_field
+#     df["src_id"] = df[src_id_field]
+#     df = df.drop(columns=[src_id_field])
 
-    if merged is None:
-        merged = df
-    else:
-        merged = merged.append(df, ignore_index=True, sort=False)
+#     if merged is None:
+#         merged = df
+#     else:
+#         merged = merged.append(df, ignore_index=True, sort=False)
 
-# For testing
-print("Writing shapefile...")
-merged.to_file(os.path.join(out_dir, "na_grts_wgs84.shp"))
+# # For testing
+# print("Writing shapefile...")
+# merged.to_file(os.path.join(out_dir, "na_grts_wgs84.shp"))
 
-print("Writing GeoJSON...")
-filename = os.path.join(out_dir, "na_grts_wgs84.json")
-# JSON cannot be overwritten, so delete it first
-if os.path.exists(filename):
-    os.remove(filename)
-merged.to_file(filename, driver="GeoJSON")
+# print("Writing GeoJSON...")
+# filename = os.path.join(out_dir, "na_grts_wgs84.json")
+# # JSON cannot be overwritten, so delete it first
+# if os.path.exists(filename):
+#     os.remove(filename)
+# merged.to_file(filename, driver="GeoJSON")
 
 ### Do a spatial join of GRTS grids to 50k grids
 # We did not use the master frame lookup of 10k -> 50k because the IDs were not correct for this version of the 50k grids
@@ -115,7 +115,7 @@ for frame, size in zip(frames, sizes):
 
 
 merged = merged.reindex()
-merged["id"] = merged.index
+merged["id"] = merged.index.astype("str")  # to match GRTS_ID
 
 # For testing
 print("Writing shapefile...")
@@ -174,7 +174,7 @@ for frame, size in zip(frames, sizes):
         merged = merged.append(df, ignore_index=True, sort=False)
 
 merged = merged.reindex()
-merged["id"] = merged.index
+merged["id"] = merged.index.astype("str")  # to match GRTS_ID
 
 # For testing
 print("Writing shapefile...")
