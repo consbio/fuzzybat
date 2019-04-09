@@ -9,7 +9,6 @@ import 'mapbox-gl/dist/mapbox-gl.css'
 import styled from 'util/style'
 import { hasWindow } from 'util/dom'
 import { getCenterAndZoom } from 'util/map'
-import { networkInterfaces } from 'os'
 import config from './config'
 
 const TRANSPARENT = 'rgba(0,0,0,0)'
