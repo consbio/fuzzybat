@@ -12,7 +12,6 @@ import os
 import pandas as pd
 import geopandas as gp
 from geopandas import GeoDataFrame, GeoSeries
-from shapely.geometry import Point
 
 
 NA_BOUNDS = [
@@ -69,13 +68,14 @@ merged.to_file(filename, driver="GeoJSON")
 # We did not use the master frame lookup of 10k -> 50k because the IDs were not correct for this version of the 50k grids
 
 merged = None
+parent_size = 50
 for frame, size in zip(frames, sizes):
     print("Reading {}...".format(frame))
 
     is_AK_CAN = frame in ("ak", "can")
     frame_name = "AKCAN" if is_AK_CAN else frame.upper()
     src_id_field = ID_PATTERN.format(frame=frame_name, size=size)
-    parent_id_field = ID_PATTERN.format(frame=frame_name, size=50)
+    parent_id_field = ID_PATTERN.format(frame=frame_name, size=parent_size)
 
     grts_df = gp.read_file(
         os.path.join(derived_dir, FILENAME_PATTERN.format(frame=frame, size=size))
@@ -85,11 +85,72 @@ for frame, size in zip(frames, sizes):
 
     print("Reading parent grid")
     df = gp.read_file(
-        os.path.join(derived_dir, FILENAME_PATTERN.format(frame=frame_name, size=50))
+        os.path.join(
+            derived_dir, FILENAME_PATTERN.format(frame=frame_name, size=parent_size)
+        )
     )
 
-    # Note: AKCAN grid has a multipolygon cell that needs to be exploded
-    df = df.explode().reindex().reset_index()
+    # Note: AKCAN grid has cells that wrap the dateline, get rid of these
+    # Note: AKCAN grid has a multipolygon cell that needs to be exploded (over the dateline, so filtered out)
+    if frame_name == "AKCAN":
+        df = df.loc[df.bounds.maxx < 0]
+        # df = df.explode().reindex().reset_index()
+
+    print("Spatial join...")
+    df = (
+        gp.sjoin(df, points, op="contains", how="left")
+        # .drop(columns=["index_right"])
+        .dropna().drop_duplicates([parent_id_field])
+    )
+
+    # standardize ID fields
+    df["src"] = parent_id_field
+    df["src_id"] = df[parent_id_field]
+    df = df.drop(columns=[parent_id_field, "index_right"])
+
+    if merged is None:
+        merged = df
+    else:
+        merged = merged.append(df, ignore_index=True, sort=False)
+
+
+merged = merged.reindex()
+merged["id"] = merged.index
+
+# For testing
+print("Writing shapefile...")
+merged.to_file(os.path.join(out_dir, "na_{}km_wgs84.shp".format(parent_size)))
+
+print("Writing GeoJSON...")
+filename = os.path.join(out_dir, "na_{}km_wgs84.json".format(parent_size))
+# JSON cannot be overwritten, so delete it first
+if os.path.exists(filename):
+    os.remove(filename)
+merged.to_file(filename, driver="GeoJSON")
+
+
+### Merge 100km grids together
+merged = None
+for frame, size in zip(frames, sizes):
+    print("Reading {}...".format(frame))
+
+    # Select out the cells that contain GRTS cells
+    grts_df = gp.read_file(
+        os.path.join(derived_dir, FILENAME_PATTERN.format(frame=frame, size=size))
+    )
+    points = gp.GeoDataFrame(geometry=grts_df.centroid)
+
+    is_AK_CAN = frame in ("ak", "can")
+    frame_name = "AKCAN" if is_AK_CAN else frame.upper()
+    src_id_field = ID_PATTERN.format(frame=frame_name, size=100)[:10]
+
+    df = gp.read_file(
+        os.path.join(derived_dir, FILENAME_PATTERN.format(frame=frame_name, size=100))
+    )
+
+    # Add lat / long fields
+    df["long"] = df.centroid.x
+    df["lat"] = df.centroid.y
 
     # Note: AKCAN grid has cells that wrap the dateline, get rid of these
     if frame_name == "AKCAN":
@@ -99,27 +160,29 @@ for frame, size in zip(frames, sizes):
     df = (
         gp.sjoin(df, points, op="contains", how="left")
         .dropna()
-        .drop_duplicates([parent_id_field])
+        .drop_duplicates([src_id_field])
     )
 
-    # standardize ID fields
-    df["src"] = parent_id_field
-    df["src_id"] = df[parent_id_field]
-    df = df.drop(columns=[parent_id_field])
+    # standardize source attributes for easier merging
+    df["src"] = src_id_field
+    df["src_id"] = df[src_id_field]
+    df = df.drop(columns=[src_id_field, "index_right"])
 
     if merged is None:
         merged = df
     else:
         merged = merged.append(df, ignore_index=True, sort=False)
 
+merged = merged.reindex()
+merged["id"] = merged.index
+
 # For testing
 print("Writing shapefile...")
-merged.to_file(os.path.join(out_dir, "na_50km_wgs84.shp"))
+merged.to_file(os.path.join(out_dir, "na_100km_wgs84.shp"))
 
 print("Writing GeoJSON...")
-filename = os.path.join(out_dir, "na_50km_wgs84.json")
+filename = os.path.join(out_dir, "na_100km_wgs84.json")
 # JSON cannot be overwritten, so delete it first
 if os.path.exists(filename):
     os.remove(filename)
 merged.to_file(filename, driver="GeoJSON")
-
