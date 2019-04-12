@@ -4,6 +4,8 @@ import styled, { ThemeProvider, theme } from 'util/style'
 
 import Header from 'components/Header'
 import { Flex } from 'components/Grid'
+import { isUnsupported } from 'util/dom'
+import UnsupportedBrowser from './UnsupportedBrowser'
 import config from '../../../config/meta'
 
 const Wrapper = styled(Flex).attrs({ flexDirection: 'column' })`
@@ -18,7 +20,8 @@ const Layout = ({ children }) => (
   <ThemeProvider theme={theme}>
     <Wrapper>
       <Header siteTitle={config.siteTitle} />
-      <Content>{children}</Content>
+
+      {!isUnsupported ? <UnsupportedBrowser /> : <Content>{children}</Content>}
     </Wrapper>
   </ThemeProvider>
 )
