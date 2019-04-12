@@ -20,8 +20,7 @@ const Layout = ({ children }) => (
   <ThemeProvider theme={theme}>
     <Wrapper>
       <Header siteTitle={config.siteTitle} />
-
-      {!isUnsupported ? <UnsupportedBrowser /> : <Content>{children}</Content>}
+      {isUnsupported ? <UnsupportedBrowser /> : <Content>{children}</Content>}
     </Wrapper>
   </ThemeProvider>
 )
