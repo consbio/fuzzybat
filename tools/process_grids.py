@@ -141,6 +141,8 @@ for parent_size in (50, 100):
     merged = merged.drop_duplicates(subset=["src", "src_id"])
     merged = merged.reindex()
     merged["id"] = merged.index.astype("str")  # to match GRTS_ID
+    merged["long"] = merged.centroid.x
+    merged["lat"] = merged.centroid.y
 
     # remove the ones that are completely covered by bounds of CONUS
     regions = merged.dissolve(by="src")
