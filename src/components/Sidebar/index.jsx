@@ -2,6 +2,7 @@ import React, { useState } from 'react'
 import PropTypes from 'prop-types'
 import { css } from 'styled-components'
 
+import { OutboundLink } from 'components/Link'
 import { Box, Flex } from 'components/Grid'
 import { Button, ButtonGroup } from 'components/Button'
 import styled, { themeGet } from 'util/style'
@@ -28,8 +29,8 @@ const Step = styled.div`
 
 const Section = styled.section`
   &:not(:first-of-type) {
-    margin-top: 2rem;
-    padding-top: 2rem;
+    margin-top: 1rem;
+    padding-top: 1rem;
     border-top: 1px solid ${themeGet('colors.grey.200')};
   }
 `
@@ -60,6 +61,7 @@ const HelpText = styled.p`
   color: ${themeGet('colors.grey.400')};
   font-size: smaller;
   font-style: italic;
+  line-height: 1.2;
 `
 
 const Label = styled.span`
@@ -172,6 +174,24 @@ const Sidebar = ({
             100km
           </Button>
         </StyledButtonGroup>
+
+        <HelpText style={{ margin: '0.5rem 1rem 0' }}>
+          GRTS is the standard sampling framework for the{' '}
+          <OutboundLink
+            from="/map"
+            to="https://www.nabatmonitoring.org/"
+            target="_blank"
+          >
+            North American Bat Monitoring Program
+          </OutboundLink>
+          . Grid Cell IDs are not unique; please make sure to also record the
+          sampling frame used for your selected grid cell.
+          <br />
+          <br />
+          Note: there is a small amount of overlap between sampling frames at
+          country boundaries due to the way that sampling frames were
+          constructed across the continent.
+        </HelpText>
       </Section>
 
       {grid && (
@@ -225,9 +245,7 @@ const Sidebar = ({
             <SectionHeader>Selected Grid Cell:</SectionHeader>
             <Row>
               <Label>Sampling frame:</Label>
-              <Value>
-                {grid === 'na_grts' ? 'NABat GRTS' : selectedFeature.src}
-              </Value>
+              <Value>{selectedFeature.src}</Value>
             </Row>
 
             <Row>
