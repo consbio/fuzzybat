@@ -34,7 +34,7 @@ const MapPage = () => {
   }
 
   return (
-    <Layout>
+    <Layout allowScroll={false}>
       <SEO title="Home" />
       <Wrapper>
         <Sidebar

@@ -13,6 +13,7 @@ const Wrapper = styled.div`
   width: 400px;
   border-right: 1px solid ${themeGet('colors.grey.800')};
   padding: 1rem;
+  overflow-y: auto;
 `
 
 const Step = styled.div`
@@ -250,7 +251,11 @@ const Sidebar = ({
 
             <Row>
               <Label>Grid Cell ID:</Label>
-              <Value>{selectedFeature.id}</Value>
+              <Value>
+                {grid === 'na_grts'
+                  ? selectedFeature.GRTS_ID
+                  : selectedFeature.id}
+              </Value>
             </Row>
 
             <Row>

@@ -45,10 +45,12 @@ for frame, size in zip(frames, sizes):
     df = gp.read_file(
         os.path.join(derived_dir, FILENAME_PATTERN.format(frame=frame, size=size))
     )
-    df["id"] = df.GRTS_ID
     src_id_field = ID_PATTERN.format(
         frame="AKCAN" if frame in ("ak", "can") else frame.upper(), size=size
     )
+
+    # create unique ID field, since there are duplicate GRTS_IDs across frames
+    df["id"] = frame + ":" + df.GRTS_ID.astype("str")
 
     # standardize source attributes for easier merging
     df["src"] = src_id_field

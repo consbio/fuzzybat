@@ -14,19 +14,30 @@ const Wrapper = styled(Flex).attrs({ flexDirection: 'column' })`
 
 const Content = styled.div`
   flex: 1 1 auto;
+
+  overflow-y: ${({ allowScroll }) => (allowScroll ? 'auto' : 'hidden')};
 `
 
-const Layout = ({ children }) => (
+const Layout = ({ allowScroll, children }) => (
   <ThemeProvider theme={theme}>
     <Wrapper>
       <Header siteTitle={config.siteTitle} />
-      {isUnsupported ? <UnsupportedBrowser /> : <Content>{children}</Content>}
+      {isUnsupported ? (
+        <UnsupportedBrowser />
+      ) : (
+        <Content allowScroll={allowScroll}>{children}</Content>
+      )}
     </Wrapper>
   </ThemeProvider>
 )
 
 Layout.propTypes = {
   children: PropTypes.node.isRequired,
+  allowScroll: PropTypes.bool,
+}
+
+Layout.defaultProps = {
+  allowScroll: true,
 }
 
 export default Layout

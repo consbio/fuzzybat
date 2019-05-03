@@ -128,7 +128,7 @@ const Map = ({ bounds, grid, location, onSelectFeature }) => {
     map.on('zoomend', () => {
       console.log('zoom', map.getZoom())
 
-      if (gridRef.current === 'na_grts' && map.getZoom() < 5) {
+      if (gridRef.current === 'na_grts' && map.getZoom() < 6) {
         noteNode.current.innerHTML = 'Zoom in further to see GRTS grid...'
       } else {
         noteNode.current.innerHTML = ''
@@ -140,73 +140,63 @@ const Map = ({ bounds, grid, location, onSelectFeature }) => {
     }
   }, [])
 
-  useEffect(
-    () => {
-      const { current: map } = mapRef
-      const { current: marker } = markerRef
+  useEffect(() => {
+    const { current: map } = mapRef
+    const { current: marker } = markerRef
 
-      if (!map.loaded()) return
+    if (!map.loaded()) return
 
-      if (location !== null) {
-        onSelectFeature(null)
-        const { latitude, longitude } = location
-        map.flyTo({ center: [longitude, latitude], zoom: 10 })
+    if (location !== null) {
+      onSelectFeature(null)
+      const { latitude, longitude } = location
+      map.flyTo({ center: [longitude, latitude], zoom: 10 })
 
-        map.once('moveend', () => {
-          const point = map.project([longitude, latitude])
-          const feature = getFeatureAtPoint(point)
-          // source may still be loading, try again in 1 second
-          if (!feature) {
-            setTimeout(() => {
-              getFeatureAtPoint(point)
-            }, 1000)
-          }
-        })
-
-        if (!marker) {
-          markerRef.current = new mapboxgl.Marker()
-            .setLngLat([longitude, latitude])
-            .addTo(map)
-        } else {
-          marker.setLngLat([longitude, latitude])
+      map.once('moveend', () => {
+        const point = map.project([longitude, latitude])
+        const feature = getFeatureAtPoint(point)
+        // source may still be loading, try again in 1 second
+        if (!feature) {
+          setTimeout(() => {
+            getFeatureAtPoint(point)
+          }, 1000)
         }
-      } else if (marker) {
-        marker.remove()
-        markerRef.current = null
-      }
-    },
-    [location]
-  )
-
-  useEffect(
-    () => {
-      console.log('grid changed', grid)
-
-      const { current: map } = mapRef
-      if (!map.loaded()) return
-
-      // clear out any previous highlights
-      layers.forEach(({ id }) => {
-        updateHighlight(id, null)
       })
 
-      layers.forEach(({ id }) => {
-        map.setLayoutProperty(
-          id,
-          'visibility',
-          grid === id ? 'visible' : 'none'
-        )
-      })
-
-      // update zoom in note
-      if (gridRef.current === 'na_grts' && map.getZoom() < 5) {
-        noteNode.current.innerHTML = 'Zoom in further to see GRTS grid...'
+      if (!marker) {
+        markerRef.current = new mapboxgl.Marker()
+          .setLngLat([longitude, latitude])
+          .addTo(map)
       } else {
-        noteNode.current.innerHTML = ''
+        marker.setLngLat([longitude, latitude])
       }
-    },
-    [grid]
-  )
+    } else if (marker) {
+      marker.remove()
+      markerRef.current = null
+    }
+  }, [location])
+
+  useEffect(() => {
+    console.log('grid changed', grid)
+
+    const { current: map } = mapRef
+    if (!map.loaded()) return
+
+    // clear out any previous highlights
+    layers.forEach(({ id }) => {
+      updateHighlight(id, null)
+    })
+
+    layers.forEach(({ id }) => {
+      map.setLayoutProperty(id, 'visibility', grid === id ? 'visible' : 'none')
+    })
+
+    // update zoom in note
+    if (gridRef.current === 'na_grts' && map.getZoom() < 5) {
+      noteNode.current.innerHTML = 'Zoom in further to see GRTS grid...'
+    } else {
+      noteNode.current.innerHTML = ''
+    }
+  }, [grid])
 
   const updateHighlight = (gridID, id) => {
     const { current: map } = mapRef

@@ -1,4 +1,6 @@
-const TILE_HOST = 'https://tiles.batamp.databasin.org'
+// const TILE_HOST = 'https://tiles.batamp.databasin.org'
+
+const TILE_HOST = 'http://localhost:8001'
 
 const config = {
   // Mapbox public token.  TODO: migrate to .env setting
@@ -22,7 +24,7 @@ const config = {
       id: 'na_grts',
       source: 'grids',
       'source-layer': 'na_grts',
-      minzoom: 5,
+      minzoom: 6,
       maxzoom: 22,
       type: 'line',
       layout: {
