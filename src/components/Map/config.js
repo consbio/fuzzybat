@@ -1,6 +1,4 @@
-// const TILE_HOST = 'https://tiles.batamp.databasin.org'
-
-const TILE_HOST = 'http://localhost:8001'
+const TILE_HOST = 'https://tiles.batamp.databasin.org'
 
 const config = {
   // Mapbox public token.  TODO: migrate to .env setting
