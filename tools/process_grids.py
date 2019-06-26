@@ -63,7 +63,7 @@ for frame, size in zip(frames, sizes):
         merged = merged.append(df, ignore_index=True, sort=False)
 
 # Drop duplicates (there are some overlaps of same cells between AK and CA)
-merged = merged.drop_duplicates(subset=["id", "src", "src_id"])
+merged = merged.drop_duplicates(subset=["GRTS_ID", "src", "src_id"])
 
 print("dissolving regions...")
 # remove the ones that are completely covered by bounds of CONUS

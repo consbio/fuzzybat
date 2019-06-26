@@ -1,6 +1,16 @@
 # A simple tool for fuzzing coordinates of bat monitoring locations
 
+This tool enables you to identify an appropriate grid sampling frame that covers your location, and use the center point of that when submitting your coordinates to the [Bat Acoustic Monitoring Portal(BatAMP)](https://batamp.databasin.org). BatAMP is a place to archive and visualize bat monitoring datasets generated from nay type of acoustic detector or species identification process.
+
+This tool can also help you identify the appropriate sampling frame for use with the [North American Bat Monitoring Project](https://www.nabatmonitoring.org/). To do so, you must use the NABat GRTS sampling frame only.
+
+Sampling frames were constructed to cover North America (Canada, United States, and Mexico) using grid cells of approximately equal area. These sampling frames, particularly those used for NABat (GRTS) are used for systematically collecting and monitoring bat detections and occurrences over time.
+
+This application is constructed as a static web application using GatsbyJS and is hosted on Netlify at [https://grids.batamp.databasin.org/](https://grids.batamp.databasin.org/).
+
 ## Data preparation
+
+Data for the sampling frames were created and merged into a continent-wide dataset as described below. These are provided as vector tiles for use with this application.
 
 ### GRTS 5-10km frames
 
@@ -60,8 +70,8 @@ tippecanoe -f -Z1 -z8 --no-tile-stats -ai -l na_100km -o tiles/na_100km.mbtiles 
 tile-join -f --no-tile-stats --no-tile-size-limit -o tiles/grids.mbtiles tiles/na_grts.mbtiles tiles/na_50km.mbtiles tiles/na_100km.mbtiles
 ```
 
-## Boundaries
+Vector tiles are hosted at [https://tiles.databasin.org/services/batamp/grids](https://tiles.databasin.org/services/batamp/grids).
 
-Canadian electoral districts obtained from: https://www12.statcan.gc.ca/census-recensement/2011/geo/bound-limit/bound-limit-2011-eng.cfm (cartographic boundaries)
+## Credits
 
-Mexican electoral districts obtained from: http://www.electiondataarchive.org/datacenter-gred.php
+Development of this application was supported by a grant from the U.S. Department of Agriculture Forest Service - Pacific Southwest Research Station.

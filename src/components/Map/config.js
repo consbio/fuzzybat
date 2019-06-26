@@ -1,9 +1,5 @@
-const TILE_HOST = 'https://tiles.batamp.databasin.org'
-
 const config = {
-  // Mapbox public token.  TODO: migrate to .env setting
-  accessToken:
-    'pk.eyJ1IjoiYmN3YXJkIiwiYSI6InJ5NzUxQzAifQ.CVyzbyOpnStfYUQ_6r8AgQ',
+  accessToken: process.env.GATSBY_MAPBOX_API_TOKEN,
   center: [-91.426, 51.711],
   zoom: 2.3,
   minZoom: 1.75,
@@ -12,7 +8,9 @@ const config = {
   sources: {
     grids: {
       type: 'vector',
-      tiles: [`${TILE_HOST}/services/grids/tiles/{z}/{x}/{y}.pbf`],
+      tiles: [
+        'https://tiles.databasin.org/services/batamp/grids/tiles/{z}/{x}/{y}.pbf',
+      ],
       minzoom: 1,
       maxzoom: 8,
     },
