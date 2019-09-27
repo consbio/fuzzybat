@@ -1,7 +1,8 @@
 import Typography from 'typography'
-import theme from 'typography-theme-noriega'
+import typographyTheme from 'typography-theme-noriega'
+import { theme } from 'util/style'
 
-theme.overrideThemeStyles = () => ({
+typographyTheme.overrideThemeStyles = () => ({
   html: {
     overflowY: 'hidden',
     height: '100%',
@@ -9,6 +10,10 @@ theme.overrideThemeStyles = () => ({
   body: {
     height: '100%',
     width: '100%',
+  },
+  'a, a:visited, a:active': {
+    textDecoration: 'none',
+    color: theme.colors.primary[600],
   },
   // Set height on containing notes to 100% so that full screen map layouts work
   '#___gatsby': {
@@ -23,6 +28,6 @@ theme.overrideThemeStyles = () => ({
   },
 })
 
-const typography = new Typography(theme)
+const typography = new Typography(typographyTheme)
 
 export default typography
