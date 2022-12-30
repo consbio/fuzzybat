@@ -9,7 +9,7 @@
     "@rebass/grid": "^6.0.0",
     "@sentry/browser": "^5.4.3",
     "babel-plugin-styled-components": "^1.10.2",
-    "gatsby": "^2.10.5",
+    "gatsby": "^2.32.13",
     "gatsby-image": "^2.2.3",
     "gatsby-plugin-catch-links": "^2.1.0",
     "gatsby-plugin-google-analytics": "^2.1.0",
